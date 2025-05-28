@@ -24,4 +24,5 @@ while(True):
 # Acceso a los datos (ejemplo)
 print(locations[0].nombre)  # "Centro"
 print(len(locations[0].bicicletas))  # 3 bicicletas en el punto "Centro"
+print(locations[0].bicicletas[0].id_bicicleta)  # 3 bicicletas en el punto "Centro"
 print(locations[1].bicicletas[0].id_bicicleta)  # "bike004"
