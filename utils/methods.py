@@ -8,6 +8,8 @@ class PuntoDistribucion:
         self.id_punto = id_punto
         self.bicicletas = bicicletas
         self.tiempo_reparto_por_bloque = tiempo_reparto_por_bloque
+        
+
 
 
 #Clase warehouse, permite acceder a funciones que añaden o eliminan ubicaciones/bicicletas
@@ -19,11 +21,10 @@ class Warehouse:
         
         for punto in locations:
             print(f"\n📍 Punto: {punto.nombre} (ID: {punto.id_punto})")
-            print(f"🚲 Bicicletas disponibles: {len(punto.bicicletas)}")
+            print(f"🚲 Bicicletas disponibles: {(punto.bicicletas)}")
             print(f"⏱ Tiempo de reparto: {punto.tiempo_reparto_por_bloque} minutos")
             
-            for bici in punto.bicicletas:
-                print(f"   - ID Bicicleta: {bici.id_bicicleta}")
+        
         print("\nFin del reporte")
 
     def ubicacion(self, value, locations):
@@ -56,39 +57,7 @@ class Warehouse:
             print(f"❌ No se encontró el punto con ID {id_punto}")
             return locations
 
-    def bicicleta(self, value, locations):
-        if value == "add":
-            print("\n➕ Añadir bicicleta")
-            id_punto = input("ID del punto destino: ")
-            id_bici = input("ID de la bicicleta (ej: B0P9999): ")
-            
-            for punto in locations:
-                if punto.id_punto == id_punto:
-                    nueva_bici = Bicicleta(id_bici)
-                    punto.bicicletas.append(nueva_bici)
-                    print(f"✅ Bicicleta {id_bici} añadida a {punto.nombre}!")
-                    return locations
-            
-            print(f"❌ No se encontró el punto con ID {id_punto}")
-            return locations
-            
-        elif value == "remove":
-            print("\n➖ Eliminar bicicleta")
-            id_punto = input("ID del punto: ")
-            id_bici = input("ID de la bicicleta a eliminar: ")
-            
-            for punto in locations:
-                if punto.id_punto == id_punto:
-                    for bici in punto.bicicletas:
-                        if bici.id_bicicleta == id_bici:
-                            punto.bicicletas.remove(bici)
-                            print(f"✅ Bicicleta {id_bici} eliminada de {punto.nombre}!")
-                            return locations
-                    print(f"❌ No se encontró la bicicleta con ID {id_bici}")
-                    return locations
-            
-            print(f"❌ No se encontró el punto con ID {id_punto}")
-            return locations
+
 
 class Order:
     def create(self):

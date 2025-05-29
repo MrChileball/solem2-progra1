@@ -18,11 +18,7 @@ submenu_ubicaciones = """
 0. Volver
 """
 
-submenu_bicicletas = """
-1. Añadir bicicleta
-2. Eliminar bicicleta
-0. Volver
-"""
+
 
 while True:
     print(menuCommands)
@@ -48,17 +44,7 @@ while True:
                 print("Opción no válida")
                 
     elif val == "3":
-        while True:
-            print(submenu_bicicletas)
-            sub_val = input("Elija una opción: ")
-            
-            if sub_val == "0":
-                break
-            elif sub_val in ["1", "2"]:
-                action = "add" if sub_val == "1" else "remove"
-                locations = warehouse.bicicleta(action, locations)
-            else:
-                print("Opción no válida")
+        print("pedido")
     
     else:
         print("Opción no válida")
