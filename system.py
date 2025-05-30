@@ -1,57 +1,63 @@
-from utils.data import locations
-from utils.methods import Warehouse
+from utils.data import locations, pedidos
+from utils.methods import Warehouse, Order
 
-warehouse = Warehouse()
+def main():
+    warehouse = Warehouse()
+    order_system = Order(warehouse)
 
-menuCommands = """==============00==============
-Bienvenido al panel de EcoLogistik!
-1. Ver puntos de distribución
-2. Gestionar ubicaciones
-3. Gestionar bicicletas
-0. Salir
-==============00==============
-"""
+    menu_principal = """
+    ============== EcoLogistik ==============
+    1. Ver puntos de distribución
+    2. Gestionar ubicaciones
+    3. Ver bicicletas disponibles
+    4. Crear pedido
+    0. Salir
+    ========================================
+    """
 
-submenu_ubicaciones = """
-1. Añadir Ubicación
-2. Eliminar ubicación
-0. Volver
-"""
+    submenu_ubicaciones = """
+    1. Añadir Ubicación
+    2. Eliminar ubicación
+    0. Volver
+    """
 
+    current_locations = locations.copy()
 
+    while True:
+        print(menu_principal)
+        opcion = input("Seleccione una opción: ")
 
-while True:
-    print(menuCommands)
-    val = input("Ingrese una opción: ")
-    
-    if val == "0":
-        break
-        
-    elif val == "1":
-        warehouse.status(locations)
-        
-    elif val == "2":
-        while True:
-            print(submenu_ubicaciones)
-            sub_val = input("Elija una opción: ")
+        if opcion == "0":
+            print("¡Hasta pronto!")
+            break
             
-            if sub_val == "0":
-                break
-            elif sub_val in ["1", "2"]:
-                action = "add" if sub_val == "1" else "remove"
-                locations = warehouse.ubicacion(action, locations)
-            else:
-                print("Opción no válida")
+        elif opcion == "1":
+            warehouse.status(current_locations)
+            
+        elif opcion == "2":
+            while True:
+                print(submenu_ubicaciones)
+                sub_opcion = input("Seleccione una opción: ")
                 
-    elif val == "3":
-        print("pedido")
-    
-    else:
-        print("Opción no válida")
+                if sub_opcion == "0":
+                    break
+                elif sub_opcion in ["1", "2"]:
+                    action = "add" if sub_opcion == "1" else "remove"
+                    current_locations = warehouse.ubicacion(action, current_locations)
+                else:
+                    print("Opción no válida")
+                    
+        elif opcion == "3":
+            print("\n Bicicletas disponibles por punto:")
+            for punto in current_locations:
+                disponibles = sum(1 for b in punto.bicicletas if b.disponible)
+                print(f"{punto.nombre}: {disponibles}/{len(punto.bicicletas)} bicicletas")
+        
+        elif opcion == "4":
+            order_system.create(current_locations)
+        
+        else:
+            print("Opción no válida")
 
-# Ejemplos de acceso directo a los datos
-#print("\nDatos actualizados:")
-#print(locations[0].nombre)
-#print(len(locations[0].bicicletas))
-#if len(locations[0].bicicletas) > 0:
-#    print(locations[0].bicicletas[0].id_bicicleta)
+if __name__ == "__main__":
+    main()

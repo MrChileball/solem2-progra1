@@ -1,5 +1,5 @@
 
-# Ejemplo de creación de datos
+
 from utils.methods import Bicicleta, PuntoDistribucion
 
 
@@ -8,7 +8,7 @@ locations = [
         nombre="Centro",
         id_punto="loc001",
         bicicletas= 10,
-        tiempo_reparto_por_bloque=30  # minutos
+        tiempo_reparto_por_bloque=30 
     ),
     PuntoDistribucion(
         nombre="Norte",
@@ -19,7 +19,7 @@ locations = [
     PuntoDistribucion(
         nombre="Extremo sur",
         id_punto="loc003",
-        bicicletas=103,
+        bicicletas=10,
         tiempo_reparto_por_bloque=85
     )
 ]
