@@ -1,4 +1,5 @@
 from datetime import datetime
+import heapq
 
 class Bicicleta:
     def __init__(self, id_bicicleta):
@@ -25,12 +26,32 @@ class Warehouse:
     
     def ubicacion(self, action, locations):
         if action == "add":
+            from utils.data import tiempoEstimado
             nombre = input("Nombre del nuevo punto: ")
             bicis = int(input("Número de bicicletas: "))
-            tiempo = int(input("Tiempo de reparto por bloque (min): "))
-            nuevo_punto = PuntoDistribucion(nombre, f"loc{len(locations)+1:03d}", bicis, tiempo)
+            conexiones = {}
+            print("\nConfigurar conexiones directas (ingresa 'fin' para terminar):")
+            while True:
+                comuna_vecina = input("  - Nombre de comuna conectada: ").strip().lower()
+                if comuna_vecina == "fin":
+                    break
+                if comuna_vecina not in tiempoEstimado:
+                    print(f"    ¡Error: '{comuna_vecina}' no existe en el sistema!")
+                    continue
+                tiempo = int(input(f"  - Tiempo de viaje a {comuna_vecina} (min): "))
+                conexiones[comuna_vecina] = tiempo
+            
+            # Paso 2: Crear el punto y actualizar el grafo
+            nuevo_punto = PuntoDistribucion(nombre, f"loc{len(locations)+1:03d}", bicis, 0)
             locations.append(nuevo_punto)
-            print(f" Punto '{nombre}' añadido!")
+            
+            # Actualizar tiempoEstimado (bidireccional)
+            tiempoEstimado[nombre] = conexiones
+            for vecino, tiempo in conexiones.items():
+                tiempoEstimado[vecino][nombre] = tiempo  # Conexión inversa
+            
+            print(f"\n  Punto '{nombre}' añadido con éxito!")
+            print(f"  Conexiones: {conexiones}")
         elif action == "remove":
             self.status(locations)
             idx = int(input("Número del punto a eliminar: ")) - 1
@@ -69,7 +90,19 @@ class Order:
         bicicleta = self._asignar_bicicleta(punto)
         if not bicicleta:
             print(" No hay bicicletas disponibles en este punto.")
-            return
+            # Buscar comuna cercana con bicis disponibles
+            punto_alternativo = self._buscar_comuna_cercana(locations, comuna)
+            if punto_alternativo:
+                print(f" Asignando bicicleta desde {punto_alternativo.nombre} (comuna cercana)")
+                bicicleta = self._asignar_bicicleta(punto_alternativo)
+                if bicicleta:
+                    punto = punto_alternativo
+                else:
+                    print(" No hay bicicletas disponibles en comunas cercanas.")
+                    return
+            else:
+                print(" No hay comunas cercanas con bicicletas disponibles.")
+                return
         
         pedido = {
             'id': len(pedidos) + 1,
@@ -95,9 +128,55 @@ class Order:
  
     def _seleccionar_punto(self, locations, comuna):
         for p in locations:
-            if p.nombre == comuna:  # Coincidencia exacta
-                return p  # Retorna el primer punto que encuentre
-        return None  # Si no hay coincidencia
+            if p.nombre == comuna:
+                return p
+        return None
+    
+    def _buscar_comuna_cercana(self, locations, comuna_objetivo):
+    
+        from utils.data import tiempoEstimado
+    
+        # 1. Identificar puntos con bicicletas disponibles
+        puntos_con_bicis = [
+            p for p in locations 
+            if any(b.disponible for b in p.bicicletas)
+        ]
+    
+        if not puntos_con_bicis:
+            return None
+    
+        # 2. Inicializar estructuras para Dijkstra
+        distancias = {comuna: float('inf') for comuna in tiempoEstimado}
+        distancias[comuna_objetivo] = 0
+        cola = [(0, comuna_objetivo)]
+        visitados = set()
+
+        # 3. Diccionario para reconstruir rutas (opcional)
+        previos = {comuna: None for comuna in tiempoEstimado}
+
+        while cola:
+            tiempo_actual, comuna_actual = heapq.heappop(cola)
+        
+            # Si encontramos una comuna con bicis, la retornamos inmediatamente
+            # (gracias a la cola de prioridad, será la de menor distancia)
+            for p in puntos_con_bicis:
+                if p.nombre == comuna_actual:
+                    return p
+        
+            if comuna_actual in visitados:
+                continue
+            visitados.add(comuna_actual)
+
+            # Explorar vecinos
+            for vecino, tiempo in tiempoEstimado[comuna_actual].items():
+                tiempo_nuevo = tiempo_actual + tiempo
+                if tiempo_nuevo < distancias[vecino]:
+                    distancias[vecino] = tiempo_nuevo
+                    previos[vecino] = comuna_actual
+                    heapq.heappush(cola, (tiempo_nuevo, vecino))
+    
+    # Si no se encontró ninguna comuna accesible con bicis
+        return None
     
     def _asignar_bicicleta(self, punto):
         return next((b for b in punto.bicicletas if b.disponible), None)

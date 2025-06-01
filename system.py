@@ -24,6 +24,7 @@ def main():
     current_locations = locations.copy()
 
     while True:
+     
         print(menu_principal)
         opcion = input("Seleccione una opción: ")
 
