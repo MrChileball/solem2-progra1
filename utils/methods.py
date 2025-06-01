@@ -18,7 +18,7 @@ class Warehouse:
         pass
         
     def status(self, locations):
-        print("\n Puntos de distribución:")
+        print("\n  Puntos de distribución:")
         for i, punto in enumerate(locations, 1):
             disponibles = sum(b.disponible for b in punto.bicicletas)
             print(f"{i}. {punto.nombre} (Bicis: {disponibles}/{len(punto.bicicletas)})")
@@ -59,8 +59,9 @@ class Order:
         direccion = input("Dirección de entrega: ")
         descripcion = input("Descripción del pedido: ")
         prioridad = input("Prioridad (normal/urgente): ").lower()
+        comuna= input("Comuna de entrega: ")
         
-        punto = self._seleccionar_punto(locations)
+        punto = self._seleccionar_punto(locations, comuna)
         if not punto:
             print(" No hay puntos de distribución disponibles.")
             return
@@ -77,7 +78,7 @@ class Order:
             'direccion': direccion,
             'descripcion': descripcion,
             'prioridad': prioridad,
-            'punto_distribucion': punto.id_punto,
+            'punto_distribucion': punto.nombre,
             'bicicleta': bicicleta.id_bicicleta,
             'estado': 'asignado',
             'fecha': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -91,12 +92,30 @@ class Order:
         print(f" Bicicleta asignada: {bicicleta.id_bicicleta}")
         print(f" Punto de distribución: {punto.nombre}")
     
-    def _seleccionar_punto(self, locations):
-        puntos_disponibles = [p for p in locations if any(b.disponible for b in p.bicicletas)]
-        return max(puntos_disponibles, key=lambda p: sum(b.disponible for b in p.bicicletas)) if puntos_disponibles else None
+ 
+    def _seleccionar_punto(self, locations, comuna):
+        for p in locations:
+            if p.nombre == comuna:  # Coincidencia exacta
+                return p  # Retorna el primer punto que encuentre
+        return None  # Si no hay coincidencia
     
     def _asignar_bicicleta(self, punto):
         return next((b for b in punto.bicicletas if b.disponible), None)
+    
+    def list_orders(self):
+        from utils.data import pedidos
+        
+        if not pedidos:
+            print(" No hay pedidos registrados.")
+            return
+        
+        print("\n Lista de Pedidos ")
+        for pedido in pedidos:
+            print(f"   | PEDIDO {pedido['id']}: \n "
+                  f"Cliente: {pedido['cliente']}, RUT: {pedido['rut']}, \n "
+                  f"Dirección: {pedido['direccion']}, Descripción: {pedido['descripcion']}, \n "
+                  f"Prioridad: {pedido['prioridad']}, Comuna bodega: {pedido['punto_distribucion']},\n "
+                  f"Bicicleta: {pedido['bicicleta']}, Estado: {pedido['estado']}, Fecha: {pedido['fecha']}")
 
 def validar_rut(rut, dv):
     rut_limpio = ''.join(filter(str.isdigit, rut))

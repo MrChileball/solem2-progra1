@@ -9,7 +9,7 @@ def main():
     ============== EcoLogistik ==============
     1. Ver puntos de distribución
     2. Gestionar ubicaciones
-    3. Ver bicicletas disponibles
+    3. Ver pedidos
     4. Crear pedido
     0. Salir
     ========================================
@@ -48,10 +48,7 @@ def main():
                     print("Opción no válida")
                     
         elif opcion == "3":
-            print("\n Bicicletas disponibles por punto:")
-            for punto in current_locations:
-                disponibles = sum(1 for b in punto.bicicletas if b.disponible)
-                print(f"{punto.nombre}: {disponibles}/{len(punto.bicicletas)} bicicletas")
+            order_system.list_orders()
         
         elif opcion == "4":
             order_system.create(current_locations)
