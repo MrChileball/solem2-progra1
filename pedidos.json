@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "cliente": "turbolin",
+        "rut": "22281604-1",
+        "direccion": "papas",
+        "descripcion": "pesas",
+        "prioridad": "normal",
+        "punto_distribucion": "providencia",
+        "bicicleta": 1,
+        "peso": 120,
+        "fecha": "2025-06-02 13:01:51"
+    }
+]

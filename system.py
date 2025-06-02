@@ -1,9 +1,10 @@
-from utils.data import locations, pedidos
-from utils.methods import Warehouse, Order
+from utils.data import locations, pedidos, tiempoEstimado
+from utils.methods import Warehouse, Order, Json
 
 def main():
     warehouse = Warehouse()
     order_system = Order(warehouse)
+    json_system = Json()
 
     menu_principal = """
     ============== EcoLogistik ==============
@@ -11,6 +12,9 @@ def main():
     2. Gestionar ubicaciones
     3. Ver pedidos
     4. Crear pedido
+    5. Entregar bono ecológico
+    6. Importar datos
+    7. Exportar datos
     0. Salir
     ========================================
     """
@@ -53,6 +57,12 @@ def main():
         
         elif opcion == "4":
             order_system.create(current_locations)
+        elif opcion == "5":
+            order_system.bonus(pedidos)
+        elif opcion == "6":
+            json_system.open(pedidos)
+        elif opcion == "7":
+            json_system.save(pedidos)
         
         else:
             print("Opción no válida")

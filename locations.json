@@ -1,0 +1,32 @@
+[
+    {
+        "nombre": "santiago",
+        "id_punto": "loc001",
+        "bicicletas": 0,
+        "tiempo_reparto_por_bloque": 30
+    },
+    {
+        "nombre": "ñuñoa",
+        "id_punto": "loc002",
+        "bicicletas": 2,
+        "tiempo_reparto_por_bloque": 45
+    },
+    {
+        "nombre": "providencia",
+        "id_punto": "loc003",
+        "bicicletas": 1,
+        "tiempo_reparto_por_bloque": 20
+    },
+    {
+        "nombre": "san joaquin",
+        "id_punto": "loc004",
+        "bicicletas": 3,
+        "tiempo_reparto_por_bloque": 17
+    },
+    {
+        "nombre": "san joaco",
+        "id_punto": "loc005",
+        "bicicletas": 2,
+        "tiempo_reparto_por_bloque": 20
+    }
+]

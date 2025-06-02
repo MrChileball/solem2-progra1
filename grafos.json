@@ -1,0 +1,17 @@
+{
+    "santiago": {
+        "ñuñoa": 30,
+        "providencia": 20
+    },
+    "ñuñoa": {
+        "santiago": 30,
+        "san joaquin": 45
+    },
+    "providencia": {
+        "santiago": 20,
+        "san joaquin": 17
+    },
+    "san joaquin": {
+        "providencia": 17,
+        "ñuñoa": 45
+    }

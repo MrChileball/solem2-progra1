@@ -33,7 +33,8 @@ locations = [
         id_punto="loc004",
         bicicletas=3,
         tiempo_reparto_por_bloque=17
-    )
+    ),
+
 ]
 
 pedidos = []

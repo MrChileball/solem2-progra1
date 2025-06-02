@@ -1,5 +1,6 @@
 from datetime import datetime
-import heapq
+import heapq, random
+import json
 
 class Bicicleta:
     def __init__(self, id_bicicleta):
@@ -79,8 +80,10 @@ class Order:
         nombre = input("Nombre del cliente: ")
         direccion = input("Dirección de entrega: ")
         descripcion = input("Descripción del pedido: ")
+        peso = int(input("Peso del producto a entregar (En Kg): "))
         prioridad = input("Prioridad (normal/urgente): ").lower()
         comuna= input("Comuna de entrega: ")
+        
         
         punto = self._seleccionar_punto(locations, comuna)
         if not punto:
@@ -90,7 +93,6 @@ class Order:
         bicicleta = self._asignar_bicicleta(punto)
         if not bicicleta:
             print(" No hay bicicletas disponibles en este punto.")
-            # Buscar comuna cercana con bicis disponibles
             punto_alternativo = self._buscar_comuna_cercana(locations, comuna)
             if punto_alternativo:
                 print(f" Asignando bicicleta desde {punto_alternativo.nombre} (comuna cercana)")
@@ -113,7 +115,7 @@ class Order:
             'prioridad': prioridad,
             'punto_distribucion': punto.nombre,
             'bicicleta': bicicleta.id_bicicleta,
-            'estado': 'asignado',
+            'peso': peso,
             'fecha': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         
@@ -125,7 +127,6 @@ class Order:
         print(f" Bicicleta asignada: {bicicleta.id_bicicleta}")
         print(f" Punto de distribución: {punto.nombre}")
     
- 
     def _seleccionar_punto(self, locations, comuna):
         for p in locations:
             if p.nombre == comuna:
@@ -135,8 +136,6 @@ class Order:
     def _buscar_comuna_cercana(self, locations, comuna_objetivo):
     
         from utils.data import tiempoEstimado
-    
-        # 1. Identificar puntos con bicicletas disponibles
         puntos_con_bicis = [
             p for p in locations 
             if any(b.disponible for b in p.bicicletas)
@@ -145,20 +144,15 @@ class Order:
         if not puntos_con_bicis:
             return None
     
-        # 2. Inicializar estructuras para Dijkstra
+        # Dijkstra
         distancias = {comuna: float('inf') for comuna in tiempoEstimado}
         distancias[comuna_objetivo] = 0
         cola = [(0, comuna_objetivo)]
         visitados = set()
-
-        # 3. Diccionario para reconstruir rutas (opcional)
         previos = {comuna: None for comuna in tiempoEstimado}
 
         while cola:
             tiempo_actual, comuna_actual = heapq.heappop(cola)
-        
-            # Si encontramos una comuna con bicis, la retornamos inmediatamente
-            # (gracias a la cola de prioridad, será la de menor distancia)
             for p in puntos_con_bicis:
                 if p.nombre == comuna_actual:
                     return p
@@ -167,15 +161,13 @@ class Order:
                 continue
             visitados.add(comuna_actual)
 
-            # Explorar vecinos
+            # Busca rutas
             for vecino, tiempo in tiempoEstimado[comuna_actual].items():
                 tiempo_nuevo = tiempo_actual + tiempo
                 if tiempo_nuevo < distancias[vecino]:
                     distancias[vecino] = tiempo_nuevo
                     previos[vecino] = comuna_actual
                     heapq.heappush(cola, (tiempo_nuevo, vecino))
-    
-    # Si no se encontró ninguna comuna accesible con bicis
         return None
     
     def _asignar_bicicleta(self, punto):
@@ -194,7 +186,38 @@ class Order:
                   f"Cliente: {pedido['cliente']}, RUT: {pedido['rut']}, \n "
                   f"Dirección: {pedido['direccion']}, Descripción: {pedido['descripcion']}, \n "
                   f"Prioridad: {pedido['prioridad']}, Comuna bodega: {pedido['punto_distribucion']},\n "
-                  f"Bicicleta: {pedido['bicicleta']}, Estado: {pedido['estado']}, Fecha: {pedido['fecha']}")
+                  f"Bicicleta: {pedido['bicicleta']}, Peso (Kg): {pedido['peso']}, Fecha: {pedido['fecha']}")
+
+    def bonus(self, pedidos):
+        pedidosEcologicos = []
+        for pedido in pedidos:
+            if pedido['peso'] < 2: 
+                pedidosEcologicos.append(pedido)
+
+        pedidosEcologicos = sorted(pedidos, key=lambda x: x['peso'], reverse=True)
+        if len(pedidos) >= 5 and len(pedidos_ecologicos) >= 1:
+            descuento = random.randint(5, 15)
+            print(f"Felicidades! El cliente {pedidosEcologicos[0].cliente} acaba de recibir un descuento!")
+            print(f"Bono ecológico aplicado: {descuento}% de descuento en su próxima compra")
+        else:
+            print("No hay pedidos que cumplan los requisitos del bono ecológico")
+
+class Json:
+    def open(self, pedidos):
+        with open('pedidos.json', 'r', encoding='utf-8') as archivo:
+            pedidos_cargados = json.load(archivo)
+            
+        pedidos.clear()  
+        pedidos.extend(pedidos_cargados)
+
+        print("Datos cargados desde JSON:")
+
+        for pedido in pedidos_cargados:
+            print(f"ID: {pedido['id']}, Cliente: {pedido['cliente']}, Peso: {pedido['peso']} kg")
+    def save(self, pedidos):
+        with open('pedidos.json', 'w', encoding='utf-8') as archivo:
+            json.dump(pedidos, archivo, indent=4, ensure_ascii=False)
+        print("¡Datos exportados a 'pedidos.json'!")
 
 def validar_rut(rut, dv):
     rut_limpio = ''.join(filter(str.isdigit, rut))
